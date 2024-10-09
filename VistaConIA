@@ -1,0 +1,136 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class VistaPrincipal extends JFrame {
+    private String apiKey = "TU_API_KEY_OPENAI"; // Reemplaza con tu clave API de OpenAI
+    private int workoutIndex = 0;
+    private String[] workouts = {"Espalda | Pecho", "Piernas", "Tricep | Bicep | Homrbo", "Core"};
+
+    public VistaPrincipal() {
+        setTitle("Fitness App");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 800);
+        setLayout(new BorderLayout());
+
+        // Panel principal para la vista de contenido
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // Panel de entrenamiento
+        JPanel workoutPanel = new JPanel();
+        workoutPanel.setLayout(new BoxLayout(workoutPanel, BoxLayout.Y_AXIS));
+        JLabel workoutLabel = new JLabel(workouts[workoutIndex]);
+        JButton routineButton = new JButton("Ver rutina IA");
+
+        routineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String prompt = "Dame una rutina para " + workouts[workoutIndex];
+                String response = callOpenAI(prompt);
+                JOptionPane.showMessageDialog(null, response, "Rutina sugerida por IA", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        workoutPanel.add(workoutLabel);
+        workoutPanel.add(routineButton);
+
+        // Panel de comidas
+        JPanel mealsPanel = new JPanel();
+        mealsPanel.setLayout(new BoxLayout(mealsPanel, BoxLayout.Y_AXIS));
+        mealsPanel.setBorder(BorderFactory.createTitledBorder("Comidas"));
+
+        String[] mealOptions = {"Desayuno", "Almuerzo", "Merienda", "Cena"};
+        JComboBox<String> mealsComboBox = new JComboBox<>(mealOptions);
+        JButton viewRecipeButton = new JButton("Ver receta IA");
+
+        viewRecipeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedMeal = (String) mealsComboBox.getSelectedItem();
+                String prompt = "Dame una receta para " + selectedMeal;
+                String response = callOpenAI(prompt);
+                JOptionPane.showMessageDialog(null, response, "Receta sugerida por IA", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        mealsPanel.add(mealsComboBox);
+        mealsPanel.add(viewRecipeButton);
+
+        // Añadir los paneles al panel principal
+        mainPanel.add(workoutPanel);   // Panel de entrenamiento
+        mainPanel.add(mealsPanel);     // Panel de comidas
+
+        // Añadir el panel principal al frame
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Mostrar la ventana
+        setVisible(true);
+    }
+
+    // Método para hacer la llamada a la API de OpenAI
+    private String callOpenAI(String prompt) {
+        try {
+            URL url = new URL("https://api.openai.com/v1/completions");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setDoOutput(true);
+
+            String data = "{"
+                    + "\"model\": \"text-davinci-003\","
+                    + "\"prompt\": \"" + prompt + "\","
+                    + "\"max_tokens\": 150"
+                    + "}";
+
+            // Enviar datos a la API
+            OutputStream os = conn.getOutputStream();
+            os.write(data.getBytes());
+            os.flush();
+            os.close();
+
+            // Leer la respuesta de la API
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            conn.disconnect();
+
+            // Devolver la respuesta (el texto generado por la IA)
+            return parseResponse(content.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error al comunicarse con la IA.";
+        }
+    }
+
+    // Método para extraer el texto generado por la IA de la respuesta JSON
+    private String parseResponse(String response) {
+        // Aquí se puede usar una biblioteca JSON como org.json o Jackson para analizar la respuesta.
+        // Por simplicidad, extraeremos el contenido manualmente.
+        int indexStart = response.indexOf("\"text\":\"") + 8;
+        int indexEnd = response.indexOf("\"", indexStart);
+        return response.substring(indexStart, indexEnd).replace("\\n", "\n");
+    }
+
+    public static void main(String[] args) {
+        // Ejecutar en el hilo de eventos de Swing
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new VistaPrincipal();
+            }
+        });
+    }
+}
