@@ -1,19 +1,43 @@
 package Modelo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.OutputStream;
+import java.io.InputStream;
+import java.util.Scanner;
 
 public class IARecomendaciones {
-    // Método para generar rutinas y dietas con una IA existente
-    public static List<String> generarRutina(Usuario usuario) {
-        List<String> recomendaciones = new ArrayList<>();
-        // Lógica para generar rutina basada en los datos del usuario
-        return recomendaciones;
-    }
+    private static final String API_KEY = "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";
+    private static final String API_URL = "https://api.openai.com/v1/engines/davinci/completions";
 
-    public static List<String> generarDieta(Usuario usuario) {
-        List<String> recomendaciones = new ArrayList<>();
-        // Lógica para generar dieta basada en los datos del usuario
-        return recomendaciones;
+    public static String obtenerReceta(String prompt) {
+        try {
+            URL url = new URL(API_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + API_KEY);
+            connection.setDoOutput(true);
+
+            String inputJson = "{ \"prompt\": \"" + prompt + "\", \"max_tokens\": 150 }";
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = inputJson.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            try (InputStream is = connection.getInputStream(); Scanner scanner = new Scanner(is)) {
+                StringBuilder response = new StringBuilder();
+                while (scanner.hasNext()) {
+                    response.append(scanner.nextLine());
+                }
+                return response.toString();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "No se pudo obtener una receta.";
     }
 }
