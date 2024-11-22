@@ -8,16 +8,18 @@ import java.util.List;
  * Clase que representa a un usuario con sus datos personales, rutinas y dieta.
  */
 public class Usuario implements Serializable {
+    private int id;  // Atributo id
     private String nombre;
     private int edad;
     private double peso;
     private double altura;
     private String gustos;
     private List<Rutina> rutinas;
-    private Dieta dieta;
+    private Dieta dieta;  // Atributo dieta
     private List<UsuarioProgreso> progresos;
 
-    public Usuario(String nombre, int edad, double peso, double altura, String gustos) {
+    // Constructor que acepta dieta
+    public Usuario(String nombre, int edad, double peso, double altura, String gustos, Dieta dieta) {
         if (nombre == null || nombre.isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
@@ -37,10 +39,65 @@ public class Usuario implements Serializable {
         this.gustos = gustos;
         this.rutinas = new ArrayList<>();
         this.progresos = new ArrayList<>();
+        this.dieta = dieta;  // Asigna la dieta directamente
+    }
+
+    // Getters
+    public int getId() {
+        return id;  // Getter para id
+    }
+
+    public void setId(int id) {
+        this.id = id;  // Setter para id
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public double getPeso() {
+        return peso;
+    }
+
+    public double getAltura() {
+        return altura;
     }
 
     public String getGustos() {
         return gustos;
+    }
+
+    public List<Rutina> getRutinas() {
+        return new ArrayList<>(this.rutinas);
+    }
+
+    public Dieta getDieta() {
+        return this.dieta;  // Getter para dieta
+    }
+
+    public List<UsuarioProgreso> getProgresos() {
+        return new ArrayList<>(this.progresos);
+    }
+
+    // Setters
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    public void setPeso(double peso) {
+        this.peso = peso;
+    }
+
+    public void setAltura(double altura) {
+        this.altura = altura;
     }
 
     public void setGustos(String gustos) {
@@ -55,24 +112,11 @@ public class Usuario implements Serializable {
         this.rutinas.remove(rutina);
     }
 
-    public List<Rutina> getRutinas() {
-        return new ArrayList<>(this.rutinas);
-    }
-
     public void setDieta(Dieta dieta) {
-        this.dieta = dieta;
-    }
-
-    public Dieta getDieta() {
-        return this.dieta;
+        this.dieta = dieta;  // Setter para dieta
     }
 
     public void agregarProgreso(UsuarioProgreso progreso) {
         this.progresos.add(progreso);
     }
-
-    public List<UsuarioProgreso> getProgresos() {
-        return new ArrayList<>(this.progresos);
-    }
-
 }
