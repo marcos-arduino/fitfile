@@ -42,7 +42,12 @@ public class Usuario implements Serializable {
         this.dieta = dieta;  // Asigna la dieta directamente
     }
 
-    // Getters
+    // Constructor sin dieta (asigna una nueva dieta por defecto)
+    public Usuario(String nombre, int edad, double peso, double altura, String gustos) {
+        this(nombre, edad, peso, altura, gustos, new Dieta());
+    }
+
+    // Getters y Setters
     public int getId() {
         return id;  // Getter para id
     }
@@ -55,20 +60,40 @@ public class Usuario implements Serializable {
         return nombre;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public int getEdad() {
         return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
     }
 
     public double getPeso() {
         return peso;
     }
 
+    public void setPeso(double peso) {
+        this.peso = peso;
+    }
+
     public double getAltura() {
         return altura;
     }
 
+    public void setAltura(double altura) {
+        this.altura = altura;
+    }
+
     public String getGustos() {
         return gustos;
+    }
+
+    public void setGustos(String gustos) {
+        this.gustos = gustos;
     }
 
     public List<Rutina> getRutinas() {
@@ -79,29 +104,12 @@ public class Usuario implements Serializable {
         return this.dieta;  // Getter para dieta
     }
 
+    public void setDieta(Dieta dieta) {
+        this.dieta = dieta;  // Setter para dieta
+    }
+
     public List<UsuarioProgreso> getProgresos() {
         return new ArrayList<>(this.progresos);
-    }
-
-    // Setters
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setEdad(int edad) {
-        this.edad = edad;
-    }
-
-    public void setPeso(double peso) {
-        this.peso = peso;
-    }
-
-    public void setAltura(double altura) {
-        this.altura = altura;
-    }
-
-    public void setGustos(String gustos) {
-        this.gustos = gustos;
     }
 
     public void agregarRutina(Rutina rutina) {
@@ -110,10 +118,6 @@ public class Usuario implements Serializable {
 
     public void eliminarRutina(Rutina rutina) {
         this.rutinas.remove(rutina);
-    }
-
-    public void setDieta(Dieta dieta) {
-        this.dieta = dieta;  // Setter para dieta
     }
 
     public void agregarProgreso(UsuarioProgreso progreso) {

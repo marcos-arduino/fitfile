@@ -33,13 +33,15 @@ public class UsuarioDAO {
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            return new Usuario(
+            Usuario usuario = new Usuario(
                 resultSet.getString("nombre"),
                 resultSet.getInt("edad"),
                 resultSet.getDouble("peso"),
                 resultSet.getDouble("altura"),
                 resultSet.getString("gustos")
             );
+            usuario.setId(resultSet.getInt("id")); // Asignar el id del usuario a la instancia
+            return usuario;
         } else {
             return null;
         }
